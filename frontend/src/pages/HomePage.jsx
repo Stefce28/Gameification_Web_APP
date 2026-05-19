@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronRight, UsersRound } from "lucide-react";
+import { ChevronRight, Gamepad2, Target, Trophy, UsersRound } from "lucide-react";
 import EmptyState from "../components/EmptyState.jsx";
 import LoadingState from "../components/LoadingState.jsx";
 import PageLayout from "../components/PageLayout.jsx";
@@ -8,12 +8,14 @@ import PointsDisplay from "../components/PointsDisplay.jsx";
 import SearchBar from "../components/SearchBar.jsx";
 import UploadPostCard from "../components/UploadPostCard.jsx";
 import UserCard from "../components/UserCard.jsx";
-import { getFriends, getFriendsFeed, getGlobalFeed, getProfile } from "../services/api.js";
+import { getAvatarUrl } from "../data/mockData.js";
+import { getFriendRecommendations, getFriends, getFriendsFeed, getGlobalFeed, getProfile } from "../services/api.js";
 
 export default function HomePage({ userId, onLogout }) {
   const [profile, setProfile] = useState(null);
   const [feed, setFeed] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
@@ -22,9 +24,10 @@ export default function HomePage({ userId, onLogout }) {
 
     async function loadHome() {
       setLoading(true);
-      const [profileData, friendsData, friendsFeedData, globalFeedData] = await Promise.all([
+      const [profileData, friendsData, recommendationsData, friendsFeedData, globalFeedData] = await Promise.all([
         getProfile(userId),
         getFriends(userId),
+        getFriendRecommendations(userId),
         getFriendsFeed(userId),
         getGlobalFeed(),
       ]);
@@ -32,6 +35,7 @@ export default function HomePage({ userId, onLogout }) {
       if (active) {
         setProfile(profileData);
         setFriends(friendsData);
+        setRecommendations(recommendationsData);
         setFeed(friendsFeedData.length > 0 ? friendsFeedData : globalFeedData);
         setLoading(false);
       }
@@ -43,24 +47,42 @@ export default function HomePage({ userId, onLogout }) {
     };
   }, [userId]);
 
-  const filteredFriends = useMemo(() => {
+  const filteredRecommendations = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     if (!normalized) {
-      return friends;
+      return recommendations;
     }
-    return friends.filter((friend) => friend.username.toLowerCase().includes(normalized));
-  }, [friends, query]);
+    return recommendations.filter((friend) => friend.username.toLowerCase().includes(normalized));
+  }, [recommendations, query]);
 
   return (
     <PageLayout onLogout={onLogout}>
+      <div className="top-search-strip">
+        <SearchBar value={query} onChange={setQuery} placeholder="Search players and friends" />
+      </div>
+
       <div className="page-grid feed-layout">
-        <section className="main-column">
+        <aside className="left-rail">
+          {profile && (
+            <div className="profile-preview-card">
+              <img src={getAvatarUrl(profile.id, profile.username)} alt={`${profile.username} avatar`} />
+              <span className="eyebrow">Player profile</span>
+              <h2>{profile.username}</h2>
+              <PointsDisplay label="Current XP" points={profile.currentPoints} />
+              <Link className="primary-button mini" to="/profile">
+                Open profile
+              </Link>
+            </div>
+          )}
+        </aside>
+
+        <section className="main-column feed-center">
           <div className="section-header">
             <div>
               <span className="eyebrow">Friends activity</span>
-              <h1>Home feed</h1>
+              <h1>Mission feed</h1>
+              <p>Recent uploads from your network, with document previews and XP rewards.</p>
             </div>
-            {profile && <PointsDisplay label="Current points" points={profile.currentPoints} />}
           </div>
 
           {loading ? (
@@ -76,26 +98,49 @@ export default function HomePage({ userId, onLogout }) {
           )}
         </section>
 
-        <aside className="side-column">
+        <aside className="right-rail">
           <div className="panel">
             <div className="panel-heading">
               <div>
-                <span className="eyebrow">Campus circle</span>
-                <h2>Find friends</h2>
+                <span className="eyebrow">Party finder</span>
+                <h2>Friend recommendations</h2>
               </div>
               <UsersRound size={22} />
             </div>
-            <SearchBar value={query} onChange={setQuery} placeholder="Search friends" />
             <div className="friend-list-compact">
-              {filteredFriends.length > 0 ? (
-                filteredFriends.slice(0, 4).map((friend) => <UserCard key={friend.id} user={friend} />)
+              {filteredRecommendations.length > 0 ? (
+                filteredRecommendations.slice(0, 4).map((friend) => <UserCard key={friend.id} user={friend} />)
               ) : (
-                <EmptyState title="No match" message="Try another username." />
+                <EmptyState title="No recommendations" message="Your network is already tight." />
               )}
             </div>
             <Link className="text-link" to="/profile/friends">
-              View all friends <ChevronRight size={16} />
+              View friend list <ChevronRight size={16} />
             </Link>
+          </div>
+
+          <div className="panel game-widget">
+            <div className="widget-row">
+              <Gamepad2 size={22} />
+              <div>
+                <strong>Daily quest</strong>
+                <span>Upload a quality paper and earn bonus XP.</span>
+              </div>
+            </div>
+            <div className="widget-row">
+              <Target size={22} />
+              <div>
+                <strong>Next milestone</strong>
+                <span>Reach 100 total XP for Research Rookie.</span>
+              </div>
+            </div>
+            <div className="widget-row">
+              <Trophy size={22} />
+              <div>
+                <strong>Leaderboard</strong>
+                <span>Climb by submitting useful scientific material.</span>
+              </div>
+            </div>
           </div>
         </aside>
       </div>

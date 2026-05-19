@@ -25,28 +25,24 @@ export default function LeaderboardPage({ onLogout }) {
 
   return (
     <PageLayout onLogout={onLogout}>
-      <div className="section-header">
+      <div className="section-header leaderboard-heading">
         <div>
           <span className="eyebrow">Campus rankings</span>
           <h1>Leaderboard</h1>
+          <p>Top contributors stack their XP here. Click any player to inspect their public activity.</p>
         </div>
       </div>
 
       {loading ? (
         <LoadingState label="Loading rankings" />
       ) : leaderboard.length > 0 ? (
-        <>
-          <section className="podium-grid">
-            {leaderboard.slice(0, 3).map((entry) => (
+        <section className="leaderboard-arena">
+          <div className="leaderboard-list">
+            {leaderboard.map((entry) => (
               <LeaderboardCard key={entry.userId} entry={entry} />
             ))}
-          </section>
-          <section className="leaderboard-list">
-            {leaderboard.slice(3).map((entry) => (
-              <LeaderboardCard key={entry.userId} entry={entry} />
-            ))}
-          </section>
-        </>
+          </div>
+        </section>
       ) : (
         <EmptyState title="No rankings yet" message="Users will rank here after earning points." />
       )}

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Gift, PackageCheck, ShoppingBag } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Gift, PackageCheck, ShoppingBag, XCircle } from "lucide-react";
 import LoadingState from "../components/LoadingState.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import PointsDisplay from "../components/PointsDisplay.jsx";
@@ -12,7 +12,7 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
   const [item, setItem] = useState(null);
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(null);
   const [purchasing, setPurchasing] = useState(false);
 
   useEffect(() => {
@@ -36,21 +36,30 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
 
   async function handlePurchase() {
     if (!canPurchase) {
-      setMessage("You are close. Earn a few more points and this reward is yours.");
+      setMessage({
+        type: "error",
+        text: "Not enough XP. Upload more research documents to unlock this reward.",
+      });
       return;
     }
 
     setPurchasing(true);
-    setMessage("");
+    setMessage(null);
 
     try {
       await purchaseItem(userId, item.id);
       const [updatedItem, updatedProfile] = await Promise.all([getShopItem(item.id), getProfile(userId)]);
       setItem(updatedItem);
       setProfile(updatedProfile);
-      setMessage("Purchase complete. Your reward is now in purchase history.");
+      setMessage({
+        type: "success",
+        text: "Reward unlocked! Purchase successful. Check your purchase history for the new item.",
+      });
     } catch (error) {
-      setMessage(error.message);
+      setMessage({
+        type: "error",
+        text: error.message,
+      });
     } finally {
       setPurchasing(false);
     }
@@ -73,7 +82,9 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
 
       <section className="shop-detail">
         <div className="shop-detail-visual">
-          <Gift size={72} />
+          <div className="pixel-item large">
+            <Gift size={72} />
+          </div>
         </div>
         <div className="shop-detail-body">
           <span className="eyebrow">{readableEnum(item.itemType)}</span>
@@ -97,7 +108,12 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
               : "Not enough points yet. Keep uploading documents to earn more."}
           </div>
 
-          {message && <p className="inline-message">{message}</p>}
+          {message && (
+            <div className={`reward-toast ${message.type}`}>
+              {message.type === "success" ? <CheckCircle2 size={22} /> : <XCircle size={22} />}
+              <p>{message.text}</p>
+            </div>
+          )}
 
           <button className="primary-button" type="button" onClick={handlePurchase} disabled={purchasing}>
             <ShoppingBag size={18} />

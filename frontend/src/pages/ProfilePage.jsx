@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BadgeInfo, ChevronRight, History, Info, ShoppingBag, UsersRound } from "lucide-react";
+import { BadgeInfo, ChevronRight, History, Info, ShoppingBag, Sparkles, UsersRound } from "lucide-react";
 import BadgeCard from "../components/BadgeCard.jsx";
 import EmptyState from "../components/EmptyState.jsx";
 import LoadingState from "../components/LoadingState.jsx";
@@ -9,18 +9,20 @@ import PointsDisplay from "../components/PointsDisplay.jsx";
 import UploadPostCard from "../components/UploadPostCard.jsx";
 import UserCard from "../components/UserCard.jsx";
 import { getAvatarUrl } from "../data/mockData.js";
-import { getUserDetails } from "../services/api.js";
+import { getFriendRecommendations, getUserDetails } from "../services/api.js";
 
 export default function ProfilePage({ userId, onLogout }) {
   const [details, setDetails] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
-    getUserDetails(userId).then((data) => {
+    Promise.all([getUserDetails(userId), getFriendRecommendations(userId)]).then(([data, recommendationsData]) => {
       if (active) {
         setDetails(data);
+        setRecommendations(recommendationsData);
         setLoading(false);
       }
     });
@@ -37,59 +39,42 @@ export default function ProfilePage({ userId, onLogout }) {
     );
   }
 
-  const { profile, badges, uploads, friends } = details;
+  const { profile, badges, uploads } = details;
 
   return (
     <PageLayout onLogout={onLogout}>
-      <section className="profile-hero">
-        <img src={getAvatarUrl(profile.id, profile.username)} alt={`${profile.username} avatar`} />
-        <div>
-          <span className="eyebrow">Logged-in profile</span>
-          <h1>{profile.username}</h1>
-          <p>{profile.email}</p>
-        </div>
-        <div className="profile-points">
-          <PointsDisplay label="Current" points={profile.currentPoints} />
-          <PointsDisplay label="Total earned" points={profile.totalEarnedPoints} tone="gold" />
-        </div>
-      </section>
-
-      <section className="quick-actions">
-        <Link to="/profile/friends">
-          <UsersRound size={20} />
-          Friends list
-          <ChevronRight size={17} />
-        </Link>
-        <Link to="/profile/details">
-          <Info size={20} />
-          Detailed info
-          <ChevronRight size={17} />
-        </Link>
-        <Link to="/profile/purchases">
-          <ShoppingBag size={20} />
-          Purchase history
-          <ChevronRight size={17} />
-        </Link>
-      </section>
-
-      <div className="page-grid profile-grid">
-        <section className="main-column">
-          <div className="section-header compact">
+      <section className="profile-console">
+        <div className="profile-console-main">
+          <div className="profile-hero">
+            <img src={getAvatarUrl(profile.id, profile.username)} alt={`${profile.username} avatar`} />
             <div>
-              <span className="eyebrow">Achievements</span>
-              <h2>Badges</h2>
+              <span className="eyebrow">Player profile</span>
+              <h1>{profile.username}</h1>
+              <p>{profile.email}</p>
             </div>
-            <BadgeInfo size={22} />
+            <div className="profile-points">
+              <PointsDisplay label="Current XP" points={profile.currentPoints} />
+              <PointsDisplay label="Total XP" points={profile.totalEarnedPoints} tone="gold" />
+            </div>
           </div>
-          <div className="card-grid two">
-            {badges.length > 0 ? (
-              badges.map((userBadge) => (
-                <BadgeCard key={userBadge.id} badge={userBadge.badge} earnedAt={userBadge.earnedAt} />
-              ))
-            ) : (
-              <EmptyState title="No badges yet" message="Upload documents to start unlocking achievements." />
-            )}
-          </div>
+
+          <section className="quick-actions">
+            <Link to="/profile/friends">
+              <UsersRound size={20} />
+              <span>Friends list</span>
+              <ChevronRight size={17} />
+            </Link>
+            <Link to="/profile/details">
+              <Info size={20} />
+              <span>Detailed information</span>
+              <ChevronRight size={17} />
+            </Link>
+            <Link to="/profile/purchases">
+              <ShoppingBag size={20} />
+              <span>Purchase history</span>
+              <ChevronRight size={17} />
+            </Link>
+          </section>
 
           <div className="section-header compact">
             <div>
@@ -105,27 +90,42 @@ export default function ProfilePage({ userId, onLogout }) {
               <EmptyState title="No documents yet" message="Your upload events will appear here." />
             )}
           </div>
-        </section>
 
-        <aside className="side-column">
-          <div className="panel">
-            <div className="panel-heading">
-              <div>
-                <span className="eyebrow">Preview</span>
-                <h2>Friends</h2>
-              </div>
-              <UsersRound size={22} />
+          <div className="section-header compact">
+            <div>
+              <span className="eyebrow">Party finder</span>
+              <h2>Friend recommendations</h2>
             </div>
-            <div className="friend-list-compact">
-              {friends.length > 0 ? (
-                friends.slice(0, 4).map((friend) => <UserCard key={friend.id} user={friend} />)
-              ) : (
-                <EmptyState title="No friends yet" message="Accepted friends will show up here." />
-              )}
+            <Sparkles size={22} />
+          </div>
+          <div className="card-grid two recommendation-grid">
+            {recommendations.length > 0 ? (
+              recommendations.map((friend) => <UserCard key={friend.id} user={friend} />)
+            ) : (
+              <EmptyState title="No recommendations" message="All available players are already in your orbit." />
+            )}
+          </div>
+        </div>
+
+        <aside className="profile-badge-rail">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">Achievements</span>
+              <h2>Badges</h2>
             </div>
+            <BadgeInfo size={22} />
+          </div>
+          <div className="badge-stack">
+            {badges.length > 0 ? (
+              badges.map((userBadge) => (
+                <BadgeCard key={userBadge.id} badge={userBadge.badge} earnedAt={userBadge.earnedAt} />
+              ))
+            ) : (
+              <EmptyState title="No badges yet" message="Upload documents to start unlocking achievements." />
+            )}
           </div>
         </aside>
-      </div>
+      </section>
     </PageLayout>
   );
 }

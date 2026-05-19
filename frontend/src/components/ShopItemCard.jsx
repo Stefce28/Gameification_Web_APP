@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Gift, PackageCheck } from "lucide-react";
+import { ArrowRight, Coins, Gift, PackageCheck } from "lucide-react";
 import { readableEnum } from "../services/formatters.js";
 
 export default function ShopItemCard({ item, userPoints }) {
@@ -7,8 +7,11 @@ export default function ShopItemCard({ item, userPoints }) {
 
   return (
     <Link className="shop-item-card" to={`/shop/${item.id}`}>
-      <div className="shop-item-icon">
-        <Gift size={25} />
+      <div className="shop-item-art">
+        <div className="pixel-item">
+          <Gift size={34} />
+        </div>
+        <span>{readableEnum(item.itemType)}</span>
       </div>
       <div className="shop-item-main">
         <div className="card-heading-row">
@@ -20,8 +23,10 @@ export default function ShopItemCard({ item, userPoints }) {
         </div>
         <p>{item.description}</p>
         <div className="shop-card-bottom">
-          <span>{readableEnum(item.itemType)}</span>
-          <strong>{item.pricePoints} pts</strong>
+          <strong>
+            <Coins size={16} />
+            {item.pricePoints} pts
+          </strong>
           <span className={canBuy ? "enough" : "not-enough"}>{canBuy ? "Ready to redeem" : "Save more points"}</span>
         </div>
       </div>

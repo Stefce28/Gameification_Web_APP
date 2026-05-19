@@ -1,4 +1,4 @@
-import { FileText, FlaskConical, Star } from "lucide-react";
+import { FileText, FlaskConical, MessageSquareText, Star } from "lucide-react";
 import { Link } from "react-router-dom";
 import { getAvatarUrl } from "../data/mockData.js";
 import { readableEnum, timeAgo } from "../services/formatters.js";
@@ -6,6 +6,9 @@ import { readableEnum, timeAgo } from "../services/formatters.js";
 export default function UploadPostCard({ upload }) {
   const userId = upload.user?.id || upload.userId;
   const username = upload.user?.username || upload.username || "Campus user";
+  const excerpt =
+    upload.excerpt ||
+    `Preview from ${upload.scientificField}: research notes, references, and useful context for the crowdsourcing library.`;
 
   return (
     <article className="upload-post-card">
@@ -24,6 +27,11 @@ export default function UploadPostCard({ upload }) {
       </div>
 
       <h2>{upload.title}</h2>
+
+      <div className="document-preview">
+        <MessageSquareText size={18} />
+        <p>{excerpt}</p>
+      </div>
 
       <div className="post-details">
         <span>

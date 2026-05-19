@@ -98,6 +98,8 @@ export const mockUploads = [
     username: "professor_ana",
     user: { id: 2, username: "professor_ana", email: "ana@university.local" },
     title: "Machine Learning in Education",
+    excerpt:
+      "A practical look at adaptive learning systems, classroom feedback loops, and how machine learning can support better student outcomes.",
     documentType: "PAPER",
     fileSizeKb: 6200,
     scientificField: "Machine Learning",
@@ -111,6 +113,8 @@ export const mockUploads = [
     username: "student_marko",
     user: { id: 3, username: "student_marko", email: "marko@student.local" },
     title: "Open Data Survey",
+    excerpt:
+      "Survey notes on open datasets, student participation, and the reliability of community-submitted research material.",
     documentType: "ARTICLE",
     fileSizeKb: 1800,
     scientificField: "Data Science",
@@ -124,6 +128,8 @@ export const mockUploads = [
     username: "student_elena",
     user: { id: 4, username: "student_elena", email: "elena@student.local" },
     title: "Faculty Research Notes",
+    excerpt:
+      "Short research notes from a faculty working session covering methods, references, and next steps for a computer science study.",
     documentType: "PDF",
     fileSizeKb: 900,
     scientificField: "Computer Science",

@@ -52,6 +52,12 @@ export function getLoginOptions() {
   return mockUsers.filter((user) => user.role !== "ADMIN");
 }
 
+export async function getFriendRecommendations(userId) {
+  const friends = await getFriends(userId);
+  const excludedIds = new Set([Number(userId), ...friends.map((friend) => Number(friend.id))]);
+  return mockUsers.filter((user) => user.role !== "ADMIN" && !excludedIds.has(Number(user.id)));
+}
+
 export async function getProfile(userId) {
   return withFallback(
     () => request(`/users/${userId}/profile`),
@@ -126,10 +132,28 @@ export async function getShopItem(itemId) {
 }
 
 export async function purchaseItem(userId, shopItemId) {
-  return request("/shop/purchase", {
-    method: "POST",
-    body: JSON.stringify({ userId: Number(userId), shopItemId: Number(shopItemId) }),
-  });
+  return withFallback(
+    () =>
+      request("/shop/purchase", {
+        method: "POST",
+        body: JSON.stringify({ userId: Number(userId), shopItemId: Number(shopItemId) }),
+      }),
+    () => {
+      const shopItem = mockShopItems.find((item) => Number(item.id) === Number(shopItemId)) || mockShopItems[0];
+      return {
+        id: Date.now(),
+        userId: Number(userId),
+        username: getMockProfile(userId).username,
+        shopItem,
+        pricePaid: shopItem.pricePoints,
+        purchasedAt: new Date().toISOString(),
+        expiresAt: shopItem.expirationDays
+          ? new Date(Date.now() + shopItem.expirationDays * 24 * 60 * 60 * 1000).toISOString()
+          : null,
+        status: "ACTIVE",
+      };
+    },
+  );
 }
 
 export async function getPurchases(userId) {
