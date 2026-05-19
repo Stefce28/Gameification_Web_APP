@@ -100,7 +100,9 @@ export default function ProfilePage({ userId, onLogout }) {
           </div>
           <div className="card-grid two recommendation-grid">
             {recommendations.length > 0 ? (
-              recommendations.map((friend) => <UserCard key={friend.id} user={friend} />)
+              recommendations.map((friend) => (
+                <UserCard key={friend.id} user={friend} showAddFriend requesterId={userId} />
+              ))
             ) : (
               <EmptyState title="No recommendations" message="All available players are already in your orbit." />
             )}

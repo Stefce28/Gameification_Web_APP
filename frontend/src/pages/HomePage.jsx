@@ -109,7 +109,11 @@ export default function HomePage({ userId, onLogout }) {
             </div>
             <div className="friend-list-compact">
               {filteredRecommendations.length > 0 ? (
-                filteredRecommendations.slice(0, 4).map((friend) => <UserCard key={friend.id} user={friend} />)
+                filteredRecommendations
+                  .slice(0, 4)
+                  .map((friend) => (
+                    <UserCard key={friend.id} user={friend} showAddFriend requesterId={userId} />
+                  ))
               ) : (
                 <EmptyState title="No recommendations" message="Your network is already tight." />
               )}

@@ -8,8 +8,9 @@ import PointsDisplay from "../components/PointsDisplay.jsx";
 import UploadPostCard from "../components/UploadPostCard.jsx";
 import { getAvatarUrl } from "../data/mockData.js";
 import { getPublicUser } from "../services/api.js";
+import AddFriendButton from "../components/AddFriendButton.jsx";
 
-export default function PublicUserProfilePage({ onLogout }) {
+export default function PublicUserProfilePage({ currentUserId, onLogout }) {
   const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,7 +46,10 @@ export default function PublicUserProfilePage({ onLogout }) {
           <h1>{user.username}</h1>
           <p>{user.email || "Campus contributor"}</p>
         </div>
-        <PointsDisplay label="Total points" points={user.totalEarnedPoints} tone="gold" />
+        <div className="public-profile-actions">
+          <PointsDisplay label="Total points" points={user.totalEarnedPoints} tone="gold" />
+          <AddFriendButton requesterId={currentUserId} receiverId={user.id} />
+        </div>
       </section>
 
       <div className="page-grid profile-grid">

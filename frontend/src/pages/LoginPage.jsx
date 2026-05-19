@@ -21,7 +21,10 @@ export default function LoginPage({ onLogin }) {
             <Gamepad2 size={17} />
             Game mode enabled
           </span>
-          <h1>RewardHub</h1>
+          <h1 className="login-title" aria-label="RewardHub">
+            <span aria-hidden="true">Reward</span>
+            <span aria-hidden="true">Hub</span>
+          </h1>
           <p>Enter the research arena, earn XP from uploads, unlock rewards, and climb the campus leaderboard.</p>
         </div>
 

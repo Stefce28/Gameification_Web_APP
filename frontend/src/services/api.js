@@ -58,6 +58,26 @@ export async function getFriendRecommendations(userId) {
   return mockUsers.filter((user) => user.role !== "ADMIN" && !excludedIds.has(Number(user.id)));
 }
 
+export async function sendFriendRequest(requesterId, receiverId) {
+  return withFallback(
+    () =>
+      request("/friends/request", {
+        method: "POST",
+        body: JSON.stringify({
+          requesterId: Number(requesterId),
+          receiverId: Number(receiverId),
+        }),
+      }),
+    () => ({
+      id: Date.now(),
+      requester: getMockProfile(requesterId),
+      receiver: getMockProfile(receiverId),
+      status: "PENDING",
+      createdAt: new Date().toISOString(),
+    }),
+  );
+}
+
 export async function getProfile(userId) {
   return withFallback(
     () => request(`/users/${userId}/profile`),

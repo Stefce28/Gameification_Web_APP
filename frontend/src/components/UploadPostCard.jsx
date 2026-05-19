@@ -1,5 +1,5 @@
-import { FileText, FlaskConical, MessageSquareText, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { FileText, FlaskConical, MessageSquareText, Star } from "lucide-react";
 import { getAvatarUrl } from "../data/mockData.js";
 import { readableEnum, timeAgo } from "../services/formatters.js";
 

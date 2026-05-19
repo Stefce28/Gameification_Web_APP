@@ -23,7 +23,7 @@ export const mockUsers = [
     documentUploadCount: 1,
     purchaseCount: 0,
     friendCount: 1,
-    avatarUrl: "https://i.pravatar.cc/160?u=rewardhub-professor-ana",
+    avatarUrl: "/assets/avatar-pixel-cat.jpg",
   },
   {
     id: 3,
@@ -36,7 +36,7 @@ export const mockUsers = [
     documentUploadCount: 1,
     purchaseCount: 0,
     friendCount: 1,
-    avatarUrl: "https://i.pravatar.cc/160?u=rewardhub-student-marko",
+    avatarUrl: "/assets/avatar-hero-helmet.jpg",
   },
   {
     id: 4,
@@ -49,7 +49,7 @@ export const mockUsers = [
     documentUploadCount: 1,
     purchaseCount: 0,
     friendCount: 1,
-    avatarUrl: "https://i.pravatar.cc/160?u=rewardhub-student-elena",
+    avatarUrl: "/assets/avatar-pixel-wizard.jpg",
   },
 ];
 
