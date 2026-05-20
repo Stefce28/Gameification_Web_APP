@@ -4,9 +4,10 @@ import { readableEnum } from "../services/formatters.js";
 
 export default function ShopItemCard({ item, userPoints }) {
   const canBuy = Number(userPoints) >= Number(item.pricePoints);
+  const soldOut = Number(item.quantity) <= 0;
 
   return (
-    <Link className="shop-item-card" to={`/shop/${item.id}`}>
+    <Link className={`shop-item-card ${soldOut ? "sold-out" : ""}`} to={`/shop/${item.id}`}>
       <div className="shop-item-art">
         <div className="pixel-item">
           <Gift size={34} />
@@ -16,9 +17,9 @@ export default function ShopItemCard({ item, userPoints }) {
       <div className="shop-item-main">
         <div className="card-heading-row">
           <h2>{item.name}</h2>
-          <span className={`availability ${item.quantity > 0 ? "available" : "empty"}`}>
+          <span className={`availability ${soldOut ? "empty" : "available"}`}>
             <PackageCheck size={15} />
-            {item.quantity} left
+            {soldOut ? "Sold out" : `${item.quantity} left`}
           </span>
         </div>
         <p>{item.description}</p>
@@ -27,7 +28,9 @@ export default function ShopItemCard({ item, userPoints }) {
             <Coins size={16} />
             {item.pricePoints} pts
           </strong>
-          <span className={canBuy ? "enough" : "not-enough"}>{canBuy ? "Ready to redeem" : "Save more points"}</span>
+          <span className={soldOut || !canBuy ? "not-enough" : "enough"}>
+            {soldOut ? "Unavailable" : canBuy ? "Ready to redeem" : "Save more points"}
+          </span>
         </div>
       </div>
       <ArrowRight className="card-arrow" size={18} />

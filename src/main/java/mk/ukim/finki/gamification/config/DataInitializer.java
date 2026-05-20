@@ -40,7 +40,7 @@ public class DataInitializer {
             badgeRepository.save(new Badge("First Upload", "Awarded after earning 25 total points.", 25, "/icons/first-upload.png"));
             badgeRepository.save(new Badge("Research Rookie", "Awarded after earning 100 total points.", 100, "/icons/research-rookie.png"));
             badgeRepository.save(new Badge("Knowledge Builder", "Awarded after earning 250 total points.", 250, "/icons/knowledge-builder.png"));
-            badgeRepository.save(new Badge("Campus Legend", "Awarded after earning 500 total points.", 500, "/icons/campus-legend.png"));
+            badgeRepository.save(new Badge("Campus Legend", "Awarded after earning 500 total points.", 500, "/icons/cd frontcampus-legend.png"));
 
             shopItemRepository.save(new ShopItem(
                     "Digital Certificate",

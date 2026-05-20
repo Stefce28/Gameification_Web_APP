@@ -69,7 +69,7 @@ export default function HomePage({ userId, onLogout }) {
               <span className="eyebrow">Player profile</span>
               <h2>{profile.username}</h2>
               <PointsDisplay label="Current XP" points={profile.currentPoints} />
-              <Link className="primary-button mini" to="/profile">
+              <Link className="primary-button mini home-open-profile-button" to="/profile">
                 Open profile
               </Link>
             </div>

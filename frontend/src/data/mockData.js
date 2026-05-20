@@ -154,6 +154,7 @@ export const mockShopItems = [
     itemType: "DIGITAL",
     expirationDays: null,
     active: true,
+    imageUrl: "/assets/game-mode-tile.png",
   },
   {
     id: 2,
@@ -164,6 +165,7 @@ export const mockShopItems = [
     itemType: "PHYSICAL",
     expirationDays: 14,
     active: true,
+    imageUrl: "/assets/game-mode-tile.png",
   },
   {
     id: 3,
@@ -174,6 +176,7 @@ export const mockShopItems = [
     itemType: "REAL_LIFE_BENEFIT",
     expirationDays: 30,
     active: true,
+    imageUrl: "/assets/game-mode-tile.png",
   },
 ];
 

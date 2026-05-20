@@ -2,10 +2,12 @@ import { Clock, ReceiptText } from "lucide-react";
 import { formatDate, readableEnum } from "../services/formatters.js";
 
 export default function PurchaseCard({ purchase }) {
+  const imageUrl = purchase.itemImage || purchase.shopItem?.imageUrl;
+
   return (
     <article className="purchase-card">
       <div className="purchase-icon">
-        <ReceiptText size={24} />
+        {imageUrl ? <img src={imageUrl} alt="" /> : <ReceiptText size={24} />}
       </div>
       <div className="purchase-body">
         <div className="card-heading-row">

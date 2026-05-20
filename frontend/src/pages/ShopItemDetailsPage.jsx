@@ -30,11 +30,20 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
     };
   }, [itemId, userId]);
 
+  const soldOut = Number(item?.quantity || 0) <= 0;
   const canPurchase = useMemo(() => {
-    return profile && item && profile.currentPoints >= item.pricePoints && item.quantity > 0;
-  }, [profile, item]);
+    return profile && item && profile.currentPoints >= item.pricePoints && !soldOut;
+  }, [profile, item, soldOut]);
 
   async function handlePurchase() {
+    if (soldOut) {
+      setMessage({
+        type: "error",
+        text: "This reward is sold out. Check back later for a restock.",
+      });
+      return;
+    }
+
     if (!canPurchase) {
       setMessage({
         type: "error",
@@ -102,10 +111,12 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
           </div>
 
           <div className={`purchase-message ${canPurchase ? "ready" : "wait"}`}>
-            <CheckCircle2 size={19} />
-            {canPurchase
-              ? "You have enough points to redeem this reward."
-              : "Not enough points yet. Keep uploading documents to earn more."}
+            {soldOut ? <XCircle size={19} /> : <CheckCircle2 size={19} />}
+            {soldOut
+              ? "Sold out. This reward is currently unavailable."
+              : canPurchase
+                ? "You have enough points to redeem this reward."
+                : "Not enough points yet. Keep uploading documents to earn more."}
           </div>
 
           {message && (
@@ -115,9 +126,9 @@ export default function ShopItemDetailsPage({ userId, onLogout }) {
             </div>
           )}
 
-          <button className="primary-button" type="button" onClick={handlePurchase} disabled={purchasing}>
+          <button className="primary-button" type="button" onClick={handlePurchase} disabled={purchasing || soldOut}>
             <ShoppingBag size={18} />
-            {purchasing ? "Purchasing..." : "Purchase item"}
+            {soldOut ? "Sold out" : purchasing ? "Purchasing..." : "Purchase item"}
           </button>
         </div>
       </section>

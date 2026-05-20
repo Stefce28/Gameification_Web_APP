@@ -1,51 +1,63 @@
-import { useState } from "react";
-import { Check, UserPlus } from "lucide-react";
-import { sendFriendRequest } from "../services/api.js";
-
-function storageKey(requesterId, receiverId) {
-  return `rewardHubFriendRequest:${requesterId}:${receiverId}`;
-}
+import { useEffect, useState } from "react";
+import { Check, UserCheck, UserPlus, X } from "lucide-react";
+import { cancelFriendRequest, getFriendshipStatus, sendFriendRequest } from "../services/api.js";
 
 export default function AddFriendButton({ requesterId, receiverId, className = "" }) {
-  const [sent, setSent] = useState(() => {
-    if (!requesterId || !receiverId || Number(requesterId) === Number(receiverId)) {
-      return false;
-    }
-    return localStorage.getItem(storageKey(requesterId, receiverId)) === "sent";
-  });
+  const [status, setStatus] = useState(() => getFriendshipStatus(requesterId, receiverId));
   const [sending, setSending] = useState(false);
 
-  if (!requesterId || !receiverId || Number(requesterId) === Number(receiverId)) {
+  useEffect(() => {
+    setStatus(getFriendshipStatus(requesterId, receiverId));
+  }, [requesterId, receiverId]);
+
+  if (status === "SELF") {
     return null;
   }
+
+  const requestSent = status === "REQUEST_SENT";
+  const friends = status === "FRIENDS";
 
   async function handleClick(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (sent || sending) {
+    if (friends || sending) {
       return;
     }
 
     setSending(true);
     try {
-      await sendFriendRequest(requesterId, receiverId);
-      localStorage.setItem(storageKey(requesterId, receiverId), "sent");
-      setSent(true);
+      if (requestSent) {
+        await cancelFriendRequest(requesterId, receiverId);
+        setStatus("NONE");
+      } else {
+        await sendFriendRequest(requesterId, receiverId);
+        setStatus("REQUEST_SENT");
+      }
     } finally {
       setSending(false);
     }
   }
 
+  const label = friends ? "Friends" : requestSent ? "Request Sent" : sending ? "Sending..." : "Add Friend";
+  const Icon = friends ? UserCheck : requestSent ? Check : UserPlus;
+
   return (
     <button
-      className={`friend-action-button ${sent ? "sent" : ""} ${className}`}
+      className={`friend-action-button ${requestSent ? "sent" : ""} ${friends ? "friends" : ""} ${className}`}
       type="button"
       onClick={handleClick}
-      disabled={sent || sending}
+      disabled={friends || sending}
+      title={requestSent ? "Cancel request" : label}
     >
-      {sent ? <Check size={16} /> : <UserPlus size={16} />}
-      <span>{sent ? "Request Sent" : sending ? "Sending..." : "Add Friend"}</span>
+      <Icon size={16} />
+      <span className="label-main">{label}</span>
+      {requestSent && (
+        <span className="label-hover">
+          <X size={15} />
+          Cancel Request
+        </span>
+      )}
     </button>
   );
 }
